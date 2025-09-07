@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Whisperer - Transform Ideas into Powerful AI Prompts</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Color System */
+            --primary-50: #f0f9ff;
+            --primary-100: #e0f2fe;
+            --primary-500: #0ea5e9;
+            --primary-600: #0284c7;
+            --primary-700: #0369a1;
+            
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            
+            --success-50: #f0fdf4;
+            --success-500: #22c55e;
+            --success-600: #16a34a;
+            
+            --error-50: #fef2f2;
+            --error-500: #ef4444;
+            --error-600: #dc2626;
+            
+            /* Typography Scale */
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            --text-4xl: 2.25rem;
+            --text-5xl: 3rem;
+            
+            /* Spacing Scale */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+            --space-20: 5rem;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            
+            /* Border Radius */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: var(--gray-700);
+            background-color: var(--gray-50);
+            font-size: var(--text-base);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--gray-200);
+            transition: all 0.2s ease;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-4) var(--space-6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: var(--text-xl);
+            font-weight: 700;
+            color: var(--primary-600);
+            text-decoration: none;
+            letter-spacing: -0.025em;
+        }
+
+        .nav {
+            display: flex;
+            gap: var(--space-8);
+        }
+
+        .nav-link {
+            color: var(--gray-600);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: var(--text-sm);
+            transition: color 0.15s ease;
+            position: relative;
+        }
+
+        .nav-link:hover,
+        .nav-link:focus {
+            color: var(--primary-600);
+            outline: none;
+        }
+
+        .nav-link:focus-visible {
+            outline: 2px solid var(--primary-500);
+            outline-offset: 4px;
+            border-radius: var(--radius-sm);
+        }
+
+        /* Main Content */
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-6);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: var(--space-20) 0;
+            background: linear-gradient(135deg, var(--primary-50) 0%, var(--gray-50) 100%);
+            border-radius: var(--radius-2xl);
+            margin-bottom: var(--space-16);
+        }
+
+        .hero-title {
+            font-size: var(--text-5xl);
+            font-weight: 800;
+            color: var(--gray-900);
+            margin-bottom: var(--space-6);
+            letter-spacing: -0.05em;
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-size: var(--text-xl);
+            color: var(--gray-600);
+            margin-bottom: var(--space-8);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-500));
+            color: white;
+            padding: var(--space-4) var(--space-8);
+            border-radius: var(--radius-xl);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: var(--text-lg);
+            box-shadow: var(--shadow-lg);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .cta-button:focus {
+            outline: none;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: var(--space-8);
+            margin-bottom: var(--space-8);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+        }
+
+        .card-title {
+            font-size: var(--text-2xl);
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: var(--space-4);
+        }
+
+        .card-subtitle {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: var(--space-3);
+        }
+
+        .card-text {
+            color: var(--gray-600);
+            margin-bottom: var(--space-3);
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-6);
+            margin: var(--space-12) 0;
+        }
+
+        .feature-card {
+            background: white;
+            padding: var(--space-6);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--gray-200);
+            transition: all 0.2s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-icon {
+            font-size: var(--text-2xl);
+            margin-bottom: var(--space-3);
+        }
+
+        .feature-title {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: var(--space-2);
+        }
+
+        /* Demo Section */
+        .demo-section {
+            background: linear-gradient(135deg, var(--primary-50) 0%, white 100%);
+            border: 1px solid var(--primary-100);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-form {
+            max-width: 600px;
+            margin: var(--space-6) auto 0;
+        }
+
+        .input-group {
+            display: flex;
+            gap: var(--space-3);
+            margin-bottom: var(--space-4);
+        }
+
+        .form-input {
+            flex: 1;
+            padding: var(--space-4);
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            font-size: var(--text-base);
+            transition: all 0.15s ease;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: var(--gray-400);
+        }
+
+        .submit-button {
+            background: var(--primary-600);
+            color: white;
+            border: none;
+            padding: var(--space-4) var(--space-6);
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            font-size: var(--text-base);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .submit-button:hover:not(:disabled) {
+            background: var(--primary-700);
+            transform: translateY(-1px);
+        }
+
+        .submit-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .helper-text {
+            font-size: var(--text-sm);
+            color: var(--gray-500);
+            text-align: center;
+            margin-top: var(--space-2);
+        }
+
+        /* Status Messages */
+        .status-message {
+            margin-top: var(--space-4);
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            font-weight: 500;
+            display: none;
+        }
+
+        .status-message.loading {
+            background: var(--primary-50);
+            color: var(--primary-700);
+            border: 1px solid var(--primary-200);
+            display: block;
+        }
+
+        .status-message.success {
+            background: var(--success-50);
+            color: var(--success-600);
+            border: 1px solid var(--success-200);
+            display: block;
+        }
+
+        .status-message.error {
+            background: var(--error-50);
+            color: var(--error-600);
+            border: 1px solid var(--error-200);
+            display: block;
+        }
+
+        /* Results */
+        .results-container {
+            margin-top: var(--space-6);
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--gray-200);
+            overflow: hidden;
+            display: none;
+        }
+
+        .results-container.show {
+            display: block;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .results-header {
+            background: var(--gray-50);
+            padding: var(--space-4);
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .results-title {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            color: var(--gray-900);
+            margin: 0;
+        }
+
+        .result-block {
+            padding: var(--space-4);
+        }
+
+        .result-label {
+            font-size: var(--text-sm);
+            font-weight: 600;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            margin-bottom: var(--space-2);
+        }
+
+        .result-content {
+            background: var(--gray-50);
+            padding: var(--space-4);
+            border-radius: var(--radius-md);
+            font-size: var(--text-base);
+            line-height: 1.6;
+            white-space: pre-wrap;
+            border: 1px solid var(--gray-200);
+            margin-bottom: var(--space-4);
+        }
+
+        .copy-button {
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .copy-button:hover {
+            background: var(--gray-200);
+        }
+
+        .copy-button.success {
+            background: var(--success-100);
+            color: var(--success-700);
+            border-color: var(--success-300);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main {
+                padding: var(--space-4);
+            }
+
+            .hero {
+                padding: var(--space-16) var(--space-6);
+            }
+
+            .hero-title {
+                font-size: var(--text-3xl);
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .nav {
+                gap: var(--space-4);
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header" role="banner">
+        <div class="header-container">
+            <a href="#" class="logo" aria-label="AI Whisperer home">AI Whisperer</a>
+            <nav class="nav" role="navigation" aria-label="Main navigation">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="templates.html" class="nav-link">Templates</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main" role="main">
+        <section class="hero" aria-labelledby="hero-title">
+            <h1 id="hero-title" class="hero-title">Transform Ideas into Powerful AI Prompts</h1>
+            <p class="hero-subtitle">AI Whisperer helps non-technical users harness the power of AI by transforming everyday language into effective prompt chains that deliver amazing results.</p>
+            <a href="#demo" class="cta-button">Try AI Whisperer Free</a>
+        </section>
+
+        <section class="card" aria-labelledby="features-title">
+            <h2 id="features-title" class="card-title">Our intelligent system transforms your ideas into step-by-step AI interactions</h2>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🗣️</div>
+                    <h3 class="feature-title">Plain English Input</h3>
+                    <p>Just describe what you want in plain English. No technical knowledge required.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3 class="feature-title">Smart Processing</h3>
+                    <p>We break down complex tasks into sequential prompts for optimal AI performance.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Optimized Results</h3>
+                    <p>Save time and get better results with our optimized AI interaction patterns.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">Intelligent Recommendations</h3>
+                    <p>Receive intelligent recommendations to improve your requests and outcomes.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📚</div>
+                    <h3 class="feature-title">Ready-to-Use Templates</h3>
+                    <p>Choose from ready-to-use prompt chains for common tasks and scenarios.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <h3 class="feature-title">Learning System</h3>
+                    <p>Our system learns from interactions to provide better results over time.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="demo" class="card demo-section" aria-labelledby="demo-title">
+            <h2 id="demo-title" class="card-title">See how it transforms simple requests into powerful AI interactions</h2>
+            <p class="card-text">Describe what you want to achieve, and we'll show you a single optimized prompt you can copy into any AI tool.</p>
+            
+            <form id="demo-form" class="demo-form" aria-describedby="demo-help">
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        id="demo-input" 
+                        class="form-input"
+                        placeholder="E.g., Create a website for my bakery selling custom cakes"
+                        aria-label="Your request"
+                        required
+                    >
+                    <button type="submit" id="submit-btn" class="submit-button">
+                        Generate Optimized Prompt
+                    </button>
+                </div>
+                <p id="demo-help" class="helper-text">
+                    You'll receive one concise, professional prompt to minimize tokens and maximize results.
+                </p>
+            </form>
+
+            <div id="status" class="status-message" role="status" aria-live="polite"></div>
+
+            <div id="results" class="results-container" role="region" aria-label="Generated prompt results">
+                <div class="results-header">
+                    <h3 class="results-title">✨ Your Optimized Prompt</h3>
+                </div>
+                <div class="result-block">
+                    <div class="result-label">Original Request</div>
+                    <div id="original-content" class="result-content"></div>
+                    
+                    <div class="result-label">Optimized Prompt</div>
+                    <div id="optimized-content" class="result-content"></div>
+                    
+                    <button id="copy-btn" class="copy-button" type="button">
+                        📋 Copy Optimized Prompt
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="card" aria-labelledby="templates-title">
+            <h2 id="templates-title" class="card-title">Get started quickly with our pre-built templates for common scenarios</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🌐</div>
+                    <h3 class="feature-title">Website Builder</h3>
+                    <p>Build a complete website with content, design, and functionality tailored to your needs.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Business Analysis</h3>
+                    <p>Get insights into your business performance, market trends, and growth opportunities.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">✍️</div>
+                    <h3 class="feature-title">Content Creation</h3>
+                    <p>Create engaging blog posts, social media content, and marketing materials.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📋</div>
+                    <h3 class="feature-title">Project Planning</h3>
+                    <p>Develop detailed project plans with timelines, resources, and milestones.</p>
+                </div>
+            </div>
+            <p class="card-text"><strong>Join thousands of users who are achieving amazing results with AI Whisperer. No technical skills required.</strong></p>
+        </section>
+    </main>
+
+    <script>
+        (function() {
+            'use strict';
+            
+            const form = document.getElementById('demo-form');
+            const input = document.getElementById('demo-input');
+            const submitBtn = document.getElementById('submit-btn');
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            const originalContent = document.getElementById('original-content');
+            const optimizedContent = document.getElementById('optimized-content');
+            const copyBtn = document.getElementById('copy-btn');
+
+            function showStatus(message, type) {
+                statusDiv.textContent = message;
+                statusDiv.className = 'status-message ' + type;
+            }
+
+            function hideStatus() {
+                statusDiv.className = 'status-message';
+            }
+
+            function showResults(original, optimized) {
+                originalContent.textContent = original;
+                optimizedContent.textContent = optimized;
+                resultsDiv.classList.add('show');
+            }
+
+            function hideResults() {
+                resultsDiv.classList.remove('show');
+            }
+
+            async function handleSubmit(e) {
+                e.preventDefault();
+                
+                const userInput = input.value.trim();
+                if (userInput.length < 8) {
+                    showStatus('Please enter a more detailed request (at least 8 characters)', 'error');
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Generating...';
+                hideResults();
+                showStatus('🔄 Generating your optimized prompt...', 'loading');
+
+                try {
+                    const response = await fetch('/api/create_prompt_chain', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ user_input: userInput })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Request failed: ' + response.status);
+                    }
+
+                    const data = await response.json();
+                    const optimizedPrompt = data.steps && data.steps[0] ? data.steps[0].output : '';
+                    
+                    if (!optimizedPrompt) {
+                        throw new Error('No optimized prompt generated');
+                    }
+
+                    hideStatus();
+                    showResults(userInput, optimizedPrompt);
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    showStatus('❌ Failed to generate prompt: ' + error.message, 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Generate Optimized Prompt';
+                }
+            }
+
+            async function handleCopy() {
+                try {
+                    const text = optimizedContent.textContent;
+                    await navigator.clipboard.writeText(text);
+                    
+                    copyBtn.textContent = '✅ Copied!';
+                    copyBtn.classList.add('success');
+                    
+                    setTimeout(function() {
+                        copyBtn.textContent = '📋 Copy Optimized Prompt';
+                        copyBtn.classList.remove('success');
+                    }, 2000);
+                    
+                } catch (error) {
+                    console.error('Copy failed:', error);
+                    showStatus('Failed to copy. Please select and copy manually.', 'error');
+                }
+            }
+
+            form.addEventListener('submit', handleSubmit);
+            copyBtn.addEventListener('click', handleCopy);
+
+            // Keyboard accessibility
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    form.dispatchEvent(new Event('submit'));
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
