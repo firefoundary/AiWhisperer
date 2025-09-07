@@ -19,13 +19,40 @@ def optimize():
     data = request.get_json()
     user_input = data.get('user_input', '').strip()
     
-    system_prompt = f"""You are an expert prompt engineer who creates detailed, professional prompt templates.
+    system_prompt = f"""You are a skilled professional with over 10 years of experience in your field. Your expertise lies in understanding client needs and translating them into actionable project plans.
 
-When given a user request, generate a comprehensive prompt template using PLAIN TEXT only (no markdown, no bold formatting, no asterisks).
+    Your task is to create a comprehensive, ready-to-use prompt template based on the user's request. The template should include fill-in-the-blank sections using underscores (like "Purpose: __________") where specific details need to be provided.
 
-User request: "{user_input}"
+    User request: "{user_input}"
 
-Generate a detailed plain text prompt template:"""
+    Generate a detailed prompt template that follows this structure:
+
+    **Opening:** Start with "You are a skilled [profession] with over 10 years of experience..."
+    **Task Statement:** "Your task is to assist in creating [project type]..."
+    **Fill-in Details:** Use underscores for blanks (e.g., "Project Purpose: __________")
+    **Guidelines Section:** Include specific requirements and structure
+    **Examples Section:** Provide concrete examples of what to include
+    **Cautions Section:** List important considerations and best practices
+    **Closing:** End with the desired outcome
+
+    Format the output as a complete, ready-to-use prompt template with clear sections separated by "---" dividers.
+
+    Example format:
+    You are a skilled [profession] with over 10 years of experience...
+    Your task is to assist in creating [project]. Here are the details I need to provide:
+    - [Detail 1]: __________
+    - [Detail 2]: __________
+    ---
+    [Guidelines and structure]
+    ---
+    [Examples section]
+    ---
+    [Cautions section]
+    ---
+    [Final outcome description]
+
+    Generate the complete template now:"""
+
     
     try:
         response = model.generate_content(system_prompt)
