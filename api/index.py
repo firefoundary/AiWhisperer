@@ -6,6 +6,14 @@ app = Flask(__name__, template_folder='../frontend')
 genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
 model = genai.GenerativeModel('gemini-2.5-flash')
 
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+@app.route('/templates')
+def templates():
+    return render_template('templates.html')
+
 @app.route('/api/create_prompt_chain', methods=['POST'])
 def optimize():
     data = request.get_json()
@@ -18,3 +26,6 @@ def optimize():
         'user_input': user_input,
         'steps': [{'step_number': 1, 'output': response.text.strip(), 'success': True}]
     })
+
+if __name__ == '__main__':
+    app.run(debug=True)
