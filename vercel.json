@@ -15,11 +15,6 @@
       "src": "/(.*)",
       "dest": "/api/index.py"
     }
-  ],
-  "functions": {
-    "api/**": {
-      "excludeFiles": "{src,data,outputs,PROJ,__pycache__,*.pyc,*.md,combine_prompts.py,main.py,run.py,webserver.py}/**"
-    }
-  }
+  ]
 }
 
