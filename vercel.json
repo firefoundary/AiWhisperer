@@ -1,20 +1,25 @@
 {
   "version": 2,
-  "builds": [{"src": "api/index.py", "use": "@vercel/python"}],
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python"
+    }
+  ],
   "routes": [
-    {"src": "/api/(.*)", "dest": "/api/index.py"},
-    {"src": "/(.*)", "dest": "/api/index.py"}
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.py"
+    }
   ],
   "functions": {
     "api/**": {
-      "excludeFiles": [
-        "data/**",
-        "outputs/**", 
-        "src/**",
-        "*.csv",
-        "*.md",
-        "__pycache__/**"
-      ]
+      "excludeFiles": "{src,data,outputs,PROJ,__pycache__,*.pyc,*.md,combine_prompts.py,main.py,run.py,webserver.py}/**"
     }
   }
 }
+
