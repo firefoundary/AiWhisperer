@@ -163,7 +163,7 @@ Generate a detailed prompt template that follows this structure:
 
 Opening: Start with "You are a skilled [profession] with extensive experience..."
 
-Task Statement: "Your task is to assist in creating [project type]..."
+Task Statement: "Your task is to assist in creating or directly creating [project type]..."
 
 Fill-in Details: Use underscores for blanks (e.g., "Project Details: __________")
 
