@@ -1,19 +1,44 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from supabase import create_client
 import google.generativeai as genai
 import os
 from datetime import datetime
 
-# Initialize Flask app for Vercel
-app = Flask(__name__)
+# Initialize Flask app with frontend configuration
+app = Flask(__name__, 
+            static_folder='../frontend', 
+            static_url_path='')
 
-# Initialize services (environment variables from Vercel)
+# Initialize services
 supabase = create_client(
     os.environ.get('PROJ_SUPA_URL'), 
     os.environ.get('SUPA_ANON_API')
 )
 genai.configure(api_key=os.environ.get('GEMINI_API_KEY'))
 
+# FRONTEND ROUTES - Serve your AI Whisperer interface
+@app.route('/')
+def home():
+    """Serve the main AI Whisperer interface"""
+    return send_from_directory(app.static_folder, 'index.html')
+
+@app.route('/templates')
+def templates():
+    """Serve the templates page"""
+    return send_from_directory(app.static_folder, 'templates.html')
+
+# Catch-all route for single-page application
+@app.route('/<path:path>')
+def catch_all(path):
+    """Serve static files or default to index.html for SPA routing"""
+    try:
+        # Try to serve the requested file
+        return send_from_directory(app.static_folder, path)
+    except:
+        # If file doesn't exist, serve index.html (for SPA routing)
+        return send_from_directory(app.static_folder, 'index.html')
+
+# API ROUTES - Your existing enhanced functionality
 @app.route('/api/enhanced_prompt_generation', methods=['POST'])
 def enhanced_generation():
     data = request.get_json()
@@ -78,7 +103,7 @@ def create_prompt_chain():
 
 Your task is to create a comprehensive, ready-to-use prompt template based on: "{user_input}"
 
-Generate a detailed prompt template with fill-in-the-blank sections using underscores. Use plain text strictly for your prompt generation. """
+Generate a detailed prompt template with fill-in-the-blank sections using underscores."""
 
         response = genai.GenerativeModel('gemini-2.5-flash').generate_content(system_prompt)
         
@@ -108,6 +133,7 @@ def health_check():
         'version': '2.0'
     })
 
+# HELPER FUNCTIONS (Your existing functions)
 def format_retrieved_context(similar_prompts):
     """Format retrieved prompts as rich context"""
     if not similar_prompts:
@@ -135,14 +161,7 @@ USER'S REQUEST: "{user_input}"
 
 TASK: Create a comprehensive, professional prompt template that incorporates lessons from the similar examples above.
 
-REQUIREMENTS:
-1. **Professional Structure**: Clear role definition, task statement, and success criteria
-2. **Fill-in-the-Blank Format**: Use underscores (____) for customizable sections
-3. **Contextual Intelligence**: Apply patterns from the similar examples
-4. **Actionable Guidelines**: Include specific steps and best practices
-5. **Quality Indicators**: Define what constitutes a successful outcome
-
-Generate the optimized prompt template now with no formatting:"""
+Generate the optimized prompt template now:"""
 
 def calculate_context_quality(prompts):
     """Assess quality of retrieved context"""
@@ -166,7 +185,7 @@ def log_prompt_generation(user_input, similar_prompts_count, context_quality, su
     except:
         pass  # Don't fail if logging fails
 
-
+# Required for Railway
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port, debug=False)
