@@ -161,21 +161,21 @@ Consider these relevant examples from our knowledge base:
 
 Generate a detailed prompt template that follows this structure:
 
-**Opening:** Start with "You are a skilled [profession] with extensive experience..."
+Opening: Start with "You are a skilled [profession] with extensive experience..."
 
-**Task Statement:** "Your task is to assist in creating [project type]..."
+Task Statement: "Your task is to assist in creating [project type]..."
 
-**Fill-in Details:** Use underscores for blanks (e.g., "Project Details: __________")
+Fill-in Details: Use underscores for blanks (e.g., "Project Details: __________")
 
-**Guidelines Section:** Include specific requirements and structure
+Guidelines Section: Include specific requirements and structure
 
-**Examples Section:** Provide concrete examples of what to include
+Examples Section: Provide concrete examples of what to include
 
-**Considerations Section:** List important factors and best practices
+Considerations Section: List important factors and best practices
 
 **Implementation Notes:** End with practical implementation guidance
 
-Format the output as a complete, ready-to-use prompt template with clear sections separated by "---" dividers."""
+Format the output as a complete, ready-to-use prompt template with clear sections . Do not include any formatting , give the prompt as plain text"""
 
 def calculate_context_quality(prompts):
     """Assess quality of retrieved context"""
