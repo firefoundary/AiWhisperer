@@ -2,13 +2,17 @@
   "version": 2,
   "functions": {
     "api/**/*.py": {
-      "runtime": "python3.11",
-      "maxDuration": 60
+      "runtime": "@vercel/python@4.0.0"
     }
   },
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" },
-    { "src": "/(.*)", "dest": "/frontend/$1" }
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/$1"
+    }
   ]
 }
-
