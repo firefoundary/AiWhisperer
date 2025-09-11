@@ -103,7 +103,9 @@ def create_prompt_chain():
 
 Your task is to create a comprehensive, ready-to-use prompt template based on: "{user_input}"
 
-Generate a detailed prompt template with fill-in-the-blank sections using underscores."""
+Generate a detailed prompt template with fill-in-the-blank sections using underscores.
+
+"""
 
         response = genai.GenerativeModel('gemini-2.5-flash').generate_content(system_prompt)
         
@@ -133,35 +135,20 @@ def health_check():
         'version': '2.0'
     })
 
-# HELPER FUNCTIONS (Your existing functions)
 def format_retrieved_context(similar_prompts):
-    """Format retrieved prompts as rich context"""
+    """Format examples concisely"""
     if not similar_prompts:
-        return "No similar examples found in database."
+        return "No examples available."
     
-    context_parts = []
+    examples = []
     for i, prompt in enumerate(similar_prompts, 1):
-        context_parts.append(f"""
-EXAMPLE {i} (Similarity: {prompt['similarity']:.2f}):
-Task: {prompt['task_description']}
-Effective Approach: {prompt['good_prompt'][:400]}...
-Category: {prompt.get('prompt_type', 'General')}
-        """)
+        examples.append(f"Example {i}: {prompt['task_description']} - {prompt['good_prompt'][:150]}...")
     
-    return "\n".join(context_parts)
+    return " ".join(examples)
 
 def create_enhanced_system_prompt(user_input, context):
-    """Create the intelligent system prompt"""
-    return f"""You are an expert prompt engineer with 10+ years of experience creating highly effective AI interactions.
-
-RELEVANT EXAMPLES FROM KNOWLEDGE BASE:
-{context}
-
-USER'S REQUEST: "{user_input}"
-
-TASK: Create a comprehensive, professional prompt template that incorporates lessons from the similar examples above.
-
-Generate the optimized prompt template now:"""
+    """Create concise, professional prompt without extra formatting"""
+    return f"""You are a professional prompt engineer. Based on the request "{user_input}" and these examples: {context}. Create a direct, professional prompt template using underscores for blanks. Keep it concise and actionable."""
 
 def calculate_context_quality(prompts):
     """Assess quality of retrieved context"""
