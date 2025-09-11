@@ -1,6 +1,9 @@
 from flask import Flask, request, jsonify, render_template
 import google.generativeai as genai
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__, template_folder='../frontend', static_folder='../frontend')
 genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
