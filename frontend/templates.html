@@ -668,6 +668,62 @@
     </main>
 
     <script>
+        <!-- Add this JavaScript to your templates.html -->
+        async function generateFromTemplate(templateType, formData) {
+            const loadingDiv = document.getElementById('loading');
+            const resultDiv = document.getElementById('result');
+    
+        // Build enhanced input based on template
+        let enhancedInput = '';
+    
+        if (templateType === 'website') {
+            enhancedInput = `Create a website builder prompt for: ${formData.industry} business targeting ${formData.audience} with goals of ${formData.goals}. Include sections for ${formData.features}.`;
+        } else if (templateType === 'business') {
+            enhancedInput = `Create a business analysis prompt for: ${formData.industry} company with challenges in ${formData.challenges}. Focus on ${formData.analysis_type} analysis.`;
+        }
+    
+        // Show loading
+        loadingDiv.innerHTML = `
+            <div class="loading-steps">
+                <p>🎯 Processing ${templateType} template...</p>
+                <p>📚 Finding relevant expert examples...</p>
+                <p>🧠 Customizing template with AI...</p>
+            </div>
+        `;
+    loadingDiv.style.display = 'block';
+    
+    try {
+        const response = await fetch('/api/enhanced_prompt_generation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_input: enhancedInput })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            resultDiv.innerHTML = `
+                <h3>✨ Your Custom ${templateType.charAt(0).toUpperCase() + templateType.slice(1)} Template</h3>
+                <div class="context-info">
+                    <span class="badge">📊 Based on ${data.similar_prompts_used} expert examples</span>
+                    <span class="badge">🎯 Quality: ${data.context_quality}</span>
+                </div>
+                <pre>${data.generated_template}</pre>
+                <button onclick="copyToClipboard(\`${data.generated_template.replace(/`/g, '\\`')}\`)">
+                    📋 Copy Template
+                </button>
+            `;
+        } else {
+            resultDiv.innerHTML = `<div class="error">❌ ${data.error}</div>`;
+            }
+        
+        } catch (error) {
+            resultDiv.innerHTML = `<div class="error">❌ Connection error: ${error.message}</div>`;
+        } finally {
+            loadingDiv.style.display = 'none';
+        }
+    }
+
         (function() {
             'use strict';
             

@@ -1,88 +1,171 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify
+from supabase import create_client
 import google.generativeai as genai
 import os
-from dotenv import load_dotenv
+from datetime import datetime
 
-load_dotenv()
+# Initialize Flask app for Vercel
+app = Flask(__name__)
 
-app = Flask(__name__, template_folder='../frontend', static_folder='../frontend')
-genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
-model = genai.GenerativeModel('gemini-2.5-flash')
+# Initialize services (environment variables from Vercel)
+supabase = create_client(
+    os.environ.get('PROJ_SUPA_URL'), 
+    os.environ.get('SUPA_ANON_API')
+)
+genai.configure(api_key=os.environ.get('GEMINI_API_KEY'))
 
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-@app.route('/templates')
-def templates():
-    return render_template('templates.html')
-
-@app.route('/api/create_prompt_chain', methods=['POST'])
-def optimize():
+@app.route('/api/enhanced_prompt_generation', methods=['POST'])
+def enhanced_generation():
     data = request.get_json()
     user_input = data.get('user_input', '').strip()
     
-    system_prompt = f"""You are a skilled professional with over 10 years of experience in your field. Your expertise lies in understanding client needs and translating them into actionable project plans.
-
-    Your task is to create a comprehensive, ready-to-use prompt template based on the user's request. The template should include fill-in-the-blank sections using underscores (like "Purpose: __________") where specific details need to be provided.
-
-    User request: "{user_input}"
-
-    Generate a detailed prompt template that follows this structure:
-
-    **Opening:** Start with "You are a skilled [profession] with over 10 years of experience..."
-    **Task Statement:** "Your task is to assist in creating [project type]..."
-    **Fill-in Details:** Use underscores for blanks (e.g., "Project Purpose: __________")
-    **Guidelines Section:** Include specific requirements and structure
-    **Examples Section:** Provide concrete examples of what to include
-    **Cautions Section:** List important considerations and best practices
-    **Closing:** End with the desired outcome
-
-    Format the output as a complete, ready-to-use prompt template with clear sections separated by "---" dividers.
-
-    Example format:
-    You are a skilled [profession] with over 10 years of experience...
-    Your task is to assist in creating [project]. Here are the details I need to provide:
-    - [Detail 1]: __________
-    - [Detail 2]: __________
-    ---
-    [Guidelines and structure]
-    ---
-    [Examples section]
-    ---
-    [Cautions section]
-    ---
-    [Final outcome description]
-
-    Generate the complete template now:"""
-
+    if not user_input:
+        return jsonify({'error': 'Empty input provided', 'success': False}), 400
     
     try:
-        response = model.generate_content(system_prompt)
-        raw_text = response.text.strip()
+        # Step 1: Generate embedding for user input
+        embedding_result = genai.embed_content(
+            model="models/text-embedding-004",
+            content=user_input,
+            task_type="retrieval_query"
+        )
+        
+        # Step 2: Find similar prompts using vector search
+        similar_prompts = supabase.rpc('match_prompts', {
+            'query_embedding': embedding_result['embedding'],
+            'match_threshold': 0.45,
+            'match_count': 3
+        }).execute()
+        
+        # Step 3: Build context-aware prompt
+        context = format_retrieved_context(similar_prompts.data)
+        enhanced_prompt = create_enhanced_system_prompt(user_input, context)
+        
+        # Step 4: Generate final response with Gemini
+        final_response = genai.GenerativeModel('gemini-2.5-flash').generate_content(enhanced_prompt)
+        
+        # Step 5: Log analytics
+        context_quality = calculate_context_quality(similar_prompts.data)
+        log_prompt_generation(user_input, len(similar_prompts.data), context_quality, True)
+        
+        return jsonify({
+            'user_input': user_input,
+            'similar_prompts_used': len(similar_prompts.data),
+            'generated_template': final_response.text,
+            'context_quality': context_quality,
+            'success': True
+        })
+        
+    except Exception as e:
+        log_prompt_generation(user_input, 0, 0.0, False)
+        return jsonify({
+            'user_input': user_input,
+            'error': str(e),
+            'success': False
+        }), 500
+
+@app.route('/api/create_prompt_chain', methods=['POST'])
+def create_prompt_chain():
+    """Fallback API for simple generation"""
+    data = request.get_json()
+    user_input = data.get('user_input', '').strip()
+    
+    if not user_input:
+        return jsonify({'error': 'Empty input provided', 'success': False}), 400
+    
+    try:
+        system_prompt = f"""You are a skilled professional with over 10 years of experience creating effective AI interactions.
+
+Your task is to create a comprehensive, ready-to-use prompt template based on: "{user_input}"
+
+Generate a detailed prompt template with fill-in-the-blank sections using underscores. Use plain text strictly for your prompt generation. """
+
+        response = genai.GenerativeModel('gemini-2.5-flash').generate_content(system_prompt)
         
         return jsonify({
             'user_input': user_input,
             'steps': [{
                 'step_number': 1,
-                'output': raw_text,
+                'output': response.text,
                 'success': True
-            }]
+            }],
+            'success': True
         })
         
     except Exception as e:
         return jsonify({
             'user_input': user_input,
-            'steps': [{
-                'step_number': 1,
-                'output': f"Error generating prompt: {str(e)}",
-                'success': False
-            }]
-        })
+            'error': str(e),
+            'success': False
+        }), 500
 
-@app.route('/api/test', methods=['GET'])
-def test_api():
-    return jsonify({"status": "AI Whisperer API is working"})
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    """Health check endpoint"""
+    return jsonify({
+        'status': 'healthy',
+        'timestamp': datetime.now().isoformat(),
+        'version': '2.0'
+    })
 
+def format_retrieved_context(similar_prompts):
+    """Format retrieved prompts as rich context"""
+    if not similar_prompts:
+        return "No similar examples found in database."
+    
+    context_parts = []
+    for i, prompt in enumerate(similar_prompts, 1):
+        context_parts.append(f"""
+EXAMPLE {i} (Similarity: {prompt['similarity']:.2f}):
+Task: {prompt['task_description']}
+Effective Approach: {prompt['good_prompt'][:400]}...
+Category: {prompt.get('prompt_type', 'General')}
+        """)
+    
+    return "\n".join(context_parts)
+
+def create_enhanced_system_prompt(user_input, context):
+    """Create the intelligent system prompt"""
+    return f"""You are an expert prompt engineer with 10+ years of experience creating highly effective AI interactions.
+
+RELEVANT EXAMPLES FROM KNOWLEDGE BASE:
+{context}
+
+USER'S REQUEST: "{user_input}"
+
+TASK: Create a comprehensive, professional prompt template that incorporates lessons from the similar examples above.
+
+REQUIREMENTS:
+1. **Professional Structure**: Clear role definition, task statement, and success criteria
+2. **Fill-in-the-Blank Format**: Use underscores (____) for customizable sections
+3. **Contextual Intelligence**: Apply patterns from the similar examples
+4. **Actionable Guidelines**: Include specific steps and best practices
+5. **Quality Indicators**: Define what constitutes a successful outcome
+
+Generate the optimized prompt template now with no formatting:"""
+
+def calculate_context_quality(prompts):
+    """Assess quality of retrieved context"""
+    if not prompts:
+        return 0.0
+    
+    avg_similarity = sum(p['similarity'] for p in prompts) / len(prompts)
+    return round(avg_similarity, 3)
+
+def log_prompt_generation(user_input, similar_prompts_count, context_quality, success):
+    """Log usage for analytics"""
+    try:
+        log_entry = {
+            'timestamp': datetime.now().isoformat(),
+            'user_input_length': len(user_input),
+            'similar_prompts_used': similar_prompts_count,
+            'context_quality': context_quality,
+            'success': success
+        }
+        supabase.table('usage_analytics').insert(log_entry).execute()
+    except:
+        pass  # Don't fail if logging fails
+
+# This is required for Vercel
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
