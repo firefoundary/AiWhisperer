@@ -101,7 +101,7 @@ def create_prompt_chain():
     try:
         system_prompt = f"""You are a skilled professional with over 10 years of experience creating effective AI interactions.
 
-Your task is to create a comprehensive, ready-to-use prompt template based on: "{user_input}"
+Your task is to create a ready-to-use prompt template based on: "{user_input}"
 
 Generate a detailed prompt template with fill-in-the-blank sections using underscores.
 
@@ -148,7 +148,7 @@ def format_retrieved_context(similar_prompts):
 
 def create_enhanced_system_prompt(user_input, context):
     """Create concise, professional prompt without extra formatting"""
-    return f"""You are a professional prompt engineer. Based on the request "{user_input}" and these examples: {context}. Create a direct, professional prompt template using underscores for blanks. Keep it concise and actionable."""
+    return f"""You are a professional prompt engineer. Based on the request "{user_input}" and these examples: {context}. Create a direct, professional prompt template using underscores for blanks. Keep it actionable."""
 
 def calculate_context_quality(prompts):
     """Assess quality of retrieved context"""
