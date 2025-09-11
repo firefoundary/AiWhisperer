@@ -1,476 +1,1125 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Whisperer - Transform Ideas into Powerful AI Prompts</title>
-    <style>
-        /* Enhanced styling for better UX */
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        
-        .container { 
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        }
-        
-        h1 { 
-            color: #2c3e50;
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 2.5em;
-        }
-        
-        .subtitle {
-            text-align: center;
-            color: #7f8c8d;
-            margin-bottom: 40px;
-            font-size: 1.1em;
-        }
-        
-        .input-section {
-            background: #f8f9fa;
-            padding: 30px;
-            border-radius: 12px;
-            margin: 30px 0;
-            border: 1px solid #e9ecef;
-        }
-        
-        .input-section h3 {
-            margin-top: 0;
-            color: #495057;
-        }
-        
-        #userInput { 
-            width: 100%;
-            min-height: 120px;
-            padding: 15px;
-            border: 2px solid #dee2e6;
-            border-radius: 8px;
-            font-size: 16px;
-            font-family: inherit;
-            resize: vertical;
-            transition: border-color 0.3s ease;
-        }
-        
-        #userInput:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
-        }
-        
-        .generate-btn { 
-            background: linear-gradient(45deg, #007bff, #0056b3);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 18px;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: block;
-            margin: 20px auto 0;
-        }
-        
-        .generate-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,123,255,0.3);
-        }
-        
-        .generate-btn:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        #loading { 
-            text-align: center;
-            padding: 30px;
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 8px;
-            margin: 20px 0;
-            display: none;
-        }
-        
-        .loading-steps p {
-            margin: 8px 0;
-            color: #856404;
-            font-weight: 500;
-        }
-        
-        #result { 
-            margin: 30px 0;
-            display: none;
-        }
-        
-        .result-header {
-            background: #d4edda;
-            padding: 20px;
-            border-radius: 8px 8px 0 0;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .result-header h3 {
-            margin: 0 0 10px 0;
-            color: #155724;
-        }
-        
-        .badge {
-            background: #007bff;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            margin-right: 8px;
-            display: inline-block;
-        }
-        
-        .result-content {
-            background: #f8f9fa;
-            border: 1px solid #c3e6cb;
-            border-top: none;
-            padding: 0;
-            border-radius: 0 0 8px 8px;
-        }
-        
-        .result-content pre {
-            background: transparent;
-            padding: 25px;
-            margin: 0;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: 'Monaco', 'Menlo', monospace;
-            font-size: 14px;
-            line-height: 1.5;
-            max-height: 600px;
-            overflow-y: auto;
-        }
-        
-        .result-actions {
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 0 0 8px 8px;
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-        
-        .result-actions button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        
-        .copy-btn {
-            background: #28a745;
-            color: white;
-        }
-        
-        .copy-btn:hover { background: #218838; }
-        
-        .regenerate-btn {
-            background: #6c757d;
-            color: white;
-        }
-        
-        .regenerate-btn:hover { background: #545b62; }
-        
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #f5c6cb;
-            margin: 20px 0;
-        }
-        
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin: 40px 0;
-        }
-        
-        .feature {
-            text-align: center;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border: 1px solid #e9ecef;
-        }
-        
-        .feature h4 {
-            color: #495057;
-            margin-bottom: 10px;
-        }
-        
-        .cta {
-            text-align: center;
-            margin-top: 50px;
-            padding: 30px;
-            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
-            border-radius: 12px;
-            color: white;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AiWhisperer — Transform Your Ideas into Powerful AI Prompts</title>
+
+  <!-- Google Fonts & Material Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <!-- Main stylesheet -->
+  <style>
+    /* CSS Variables for consistent theming */
+:root {
+  /* Corporate Color Palette */
+  --primary-color: #1565C0;
+  --primary-dark: #0D47A1;
+  --primary-light: #E3F2FD;
+  --secondary-color: #37474F;
+  --secondary-light: #78909C;
+  --accent-color: #00BCD4;
+  --success-color: #4CAF50;
+  --warning-color: #FF9800;
+  --error-color: #F44336;
+  
+  /* Neutral Colors */
+  --white: #FFFFFF;
+  --grey-50: #FAFAFA;
+  --grey-100: #F5F5F5;
+  --grey-200: #EEEEEE;
+  --grey-300: #E0E0E0;
+  --grey-400: #BDBDBD;
+  --grey-500: #9E9E9E;
+  --grey-600: #757575;
+  --grey-700: #616161;
+  --grey-800: #424242;
+  --grey-900: #212121;
+  
+  /* Typography */
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-secondary: 'Roboto', sans-serif;
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  
+  /* Transitions */
+  --transition-fast: 0.15s ease-in-out;
+  --transition-normal: 0.3s ease-in-out;
+  --transition-slow: 0.5s ease-in-out;
+}
+
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-primary);
+  line-height: 1.6;
+  color: var(--grey-800);
+  background-color: var(--white);
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+}
+
+/* Navigation */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--grey-200);
+  z-index: 1000;
+  transition: var(--transition-normal);
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--primary-color);
+}
+
+.nav-icon {
+  font-size: 2rem;
+}
+
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xl);
+}
+
+.nav-link {
+  text-decoration: none;
+  color: var(--grey-700);
+  font-weight: 500;
+  transition: var(--transition-fast);
+  position: relative;
+}
+
+.nav-link:hover {
+  color: var(--primary-color);
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--primary-color);
+  transition: var(--transition-fast);
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.nav-toggle {
+  display: none;
+  cursor: pointer;
+  color: var(--grey-700);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-xl);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-family: var(--font-primary);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: var(--white);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+}
+
+.btn-secondary:hover {
+  background: var(--primary-color);
+  color: var(--white);
+}
+
+.btn-large {
+  padding: var(--spacing-lg) var(--spacing-2xl);
+  font-size: 1.1rem;
+}
+
+/* Hero Section */
+.hero {
+  padding: 140px 0 var(--spacing-3xl);
+  background: linear-gradient(135deg, var(--grey-50) 0%, var(--primary-light) 100%);
+  overflow: hidden;
+}
+
+.hero-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-3xl);
+  align-items: center;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--white);
+  color: var(--primary-color);
+  border-radius: var(--radius-2xl);
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: var(--spacing-lg);
+  color: var(--grey-900);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-description {
+  font-size: 1.25rem;
+  color: var(--grey-600);
+  margin-bottom: var(--spacing-xl);
+  line-height: 1.6;
+}
+
+.hero-features {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  color: var(--grey-700);
+  font-weight: 500;
+}
+
+.feature-item .material-icons {
+  color: var(--success-color);
+  font-size: 1.25rem;
+}
+
+.hero-cta {
+  display: flex;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+/* Hero Visual */
+.hero-visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.prompt-demo-card {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+  width: 100%;
+  max-width: 400px;
+}
+
+.demo-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-lg);
+  background: var(--grey-100);
+  border-bottom: 1px solid var(--grey-200);
+}
+
+.demo-dots {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.demo-dots span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--grey-400);
+}
+
+.demo-dots span:nth-child(1) { background: var(--error-color); }
+.demo-dots span:nth-child(2) { background: var(--warning-color); }
+.demo-dots span:nth-child(3) { background: var(--success-color); }
+
+.demo-title {
+  font-weight: 600;
+  color: var(--grey-700);
+}
+
+.demo-content {
+  padding: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.prompt-input,
+.ai-processing,
+.prompt-output {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+}
+
+.prompt-input {
+  background: var(--grey-100);
+  color: var(--grey-700);
+}
+
+.ai-processing {
+  background: var(--primary-light);
+  color: var(--primary-color);
+}
+
+.prompt-output {
+  background: var(--success-color);
+  color: var(--white);
+}
+
+.processing-icon {
+  animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Sections */
+.section-header {
+  text-align: center;
+  margin-bottom: var(--spacing-3xl);
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--grey-900);
+  margin-bottom: var(--spacing-lg);
+}
+
+.section-description {
+  font-size: 1.125rem;
+  color: var(--grey-600);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Features Section */
+.features {
+  padding: var(--spacing-3xl) 0;
+  background: var(--white);
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: var(--spacing-xl);
+}
+
+.feature-card {
+  background: var(--white);
+  padding: var(--spacing-2xl);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-normal);
+  border: 1px solid var(--grey-200);
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+}
+
+.feature-icon {
+  width: 64px;
+  height: 64px;
+  background: var(--primary-light);
+  color: var(--primary-color);
+  border-radius: var(--radius-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.feature-icon .material-icons {
+  font-size: 2rem;
+}
+
+.feature-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--grey-900);
+  margin-bottom: var(--spacing-md);
+}
+
+.feature-description {
+  color: var(--grey-600);
+  line-height: 1.6;
+}
+
+/* How It Works Section */
+.how-it-works {
+  padding: var(--spacing-3xl) 0;
+  background: var(--grey-50);
+}
+
+.steps-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-2xl);
+}
+
+.step {
+  text-align: center;
+  position: relative;
+}
+
+.step-number {
+  width: 80px;
+  height: 80px;
+  background: var(--primary-color);
+  color: var(--white);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 auto var(--spacing-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.step-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--grey-900);
+  margin-bottom: var(--spacing-md);
+}
+
+.step-description {
+  color: var(--grey-600);
+  line-height: 1.6;
+}
+
+/* CTA Section */
+.cta {
+  padding: var(--spacing-3xl) 0;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: var(--white);
+  text-align: center;
+}
+
+.cta-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-lg);
+}
+
+.cta-description {
+  font-size: 1.125rem;
+  margin-bottom: var(--spacing-xl);
+  opacity: 0.9;
+}
+
+.cta .btn-primary {
+  background: var(--white);
+  color: var(--primary-color);
+}
+
+.cta .btn-primary:hover {
+  background: var(--grey-100);
+  transform: translateY(-2px);
+}
+
+/* Footer */
+.footer {
+  background: var(--grey-900);
+  color: var(--white);
+  padding: var(--spacing-3xl) 0 var(--spacing-xl);
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: var(--spacing-2xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.footer-brand {
+  max-width: 300px;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin-bottom: var(--spacing-lg);
+}
+
+.footer-description {
+  color: var(--grey-400);
+  line-height: 1.6;
+}
+
+.footer-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-lg);
+}
+
+.footer-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.footer-link {
+  color: var(--grey-400);
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+.footer-link:hover {
+  color: var(--white);
+}
+
+.footer-bottom {
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--grey-700);
+  text-align: center;
+  color: var(--grey-400);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .nav-menu {
+    display: none;
+  }
+  
+  .nav-toggle {
+    display: block;
+  }
+  
+  .hero-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .hero-cta {
+    justify-content: center;
+  }
+  
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .steps-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .footer-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  
+  .container {
+    padding: 0 var(--spacing-md);
+  }
+  
+  .section-title {
+    font-size: 2rem;
+  }
+  
+  .cta-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  .btn-large {
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: 1rem;
+  }
+  
+  .hero-cta {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .hero-cta .btn {
+    width: 100%;
+    max-width: 280px;
+    justify-content: center;
+  }
+}
+  </style>  
 </head>
 <body>
-    <div class="container">
-        <h1>🧙‍♂️ AI Whisperer</h1>
-        <p class="subtitle">Transform your ideas into powerful, professional AI prompts using our database of 1,450+ expert examples</p>
-        
-        <div class="features">
-            <div class="feature">
-                <h4>🎯 Smart Processing</h4>
-                <p>Our AI analyzes your request and finds the most relevant examples from our expert database</p>
-            </div>
-            <div class="feature">
-                <h4>📚 Expert Knowledge</h4>
-                <p>Leverages 1,450+ professionally crafted prompts to enhance your results</p>
-            </div>
-            <div class="feature">
-                <h4>⚡ Instant Results</h4>
-                <p>Get optimized, ready-to-use prompt templates in seconds</p>
-            </div>
-        </div>
-        
-        <div class="input-section">
-            <h3>✨ Describe what you want to achieve:</h3>
-            <textarea 
-                id="userInput" 
-                placeholder="Example: I want to build a website for my small business...
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <span class="material-icons nav-icon">psychology</span>
+        <span class="brand-text">AiWhisperer</span>
+      </div>
 
-I need help writing better marketing copy...
+      <div class="nav-menu">
+        <a href="#features"   class="nav-link">Features</a>
+        <a href="#how-it-works" class="nav-link">How It Works</a>
+        <a href="#pricing"    class="nav-link">Pricing</a>
+        <button class="btn btn-primary">Get Started</button>
+      </div>
 
-Create a project plan for launching a mobile app...
-
-Write code to analyze customer data..."
-                maxlength="500"
-            ></textarea>
-            <button class="generate-btn" onclick="generatePrompt()" id="generateBtn">
-                🚀 Generate Enhanced Prompt
-            </button>
-        </div>
-        
-        <div id="loading"></div>
-        <div id="result"></div>
-        
-        <div class="cta">
-            <h3>Join thousands of users achieving amazing AI results</h3>
-            <p>No technical skills required • Enhanced with expert knowledge • Instant results</p>
-        </div>
+      <div class="nav-toggle">
+        <span class="material-icons">menu</span>
+      </div>
     </div>
+  </nav>
 
-    <script>
-        async function generatePrompt() {
-            const userInput = document.getElementById('userInput').value.trim();
-            const loadingDiv = document.getElementById('loading');
-            const resultDiv = document.getElementById('result');
-            const generateBtn = document.getElementById('generateBtn');
-            
-            if (!userInput) {
-                alert('Please enter your request to get started!');
-                return;
-            }
-            
-            // Show loading state
-            loadingDiv.innerHTML = `
-                <div class="loading-steps">
-                    <h4>🤖 AI Whisperer is analyzing your request...</h4>
-                    <p>🔍 Searching through 1,450+ expert prompts...</p>
-                    <p>🧠 Finding the most relevant examples...</p>
-                    <p>✨ Generating your enhanced template...</p>
-                </div>
-            `;
-            loadingDiv.style.display = 'block';
-            resultDiv.style.display = 'none';
-            generateBtn.disabled = true;
-            generateBtn.textContent = '🔄 Processing...';
-            
-            try {
-                // Try enhanced API first
-                const response = await fetch('/api/enhanced_prompt_generation', {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'X-Session-ID': generateSessionId()
-                    },
-                    body: JSON.stringify({ user_input: userInput })
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <!-- Text -->
+        <div class="hero-text">
+          <span class="hero-badge">
+            <span class="material-icons">stars</span>
+            1,450+ Expert Prompts Available
+          </span>
+
+          <h1 class="hero-title">
+            Transform Your Ideas into
+            <span class="gradient-text">Powerful AI Prompts</span>
+          </h1>
+
+          <p class="hero-description">
+            Our AI analyzes your request and finds the most relevant examples from our database of 1,450+ professionally crafted prompts—no technical skills required.
+          </p>
+
+          <div class="hero-features">
+            <div class="feature-item"><span class="material-icons">check_circle</span>No technical skills required</div>
+            <div class="feature-item"><span class="material-icons">check_circle</span>Enhanced with expert knowledge</div>
+            <div class="feature-item"><span class="material-icons">check_circle</span>Instant results</div>
+          </div>
+
+          <div class="hero-cta">
+            <button class="btn btn-primary btn-large">
+              <span class="material-icons">rocket_launch</span>
+              Start Creating Prompts
+            </button>
+            <button class="btn btn-secondary btn-large">
+              <span class="material-icons">play_arrow</span>
+              Watch Demo
+            </button>
+          </div>
+        </div>
+
+        <!-- Visual mock-up -->
+        <div class="hero-visual">
+          <div class="prompt-demo-card">
+            <div class="demo-header">
+              <div class="demo-dots"><span></span><span></span><span></span></div>
+              <span class="demo-title">AiWhisperer</span>
+            </div>
+
+            <div class="demo-content">
+              <div class="prompt-input">
+                <span class="material-icons">edit</span>
+                <span>Your idea: "Create marketing content"</span>
+              </div>
+
+              <div class="ai-processing">
+                <span class="material-icons processing-icon">psychology</span>
+                <span>AI analyzing…</span>
+              </div>
+
+              <div class="prompt-output">
+                <span class="material-icons">auto_awesome</span>
+                <span>Optimized prompt generated!</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURES ===== -->
+  <section id="features" class="features">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Why Choose AiWhisperer?</h2>
+        <p class="section-description">
+          Leverage our expert database and AI technology to craft prompts that deliver exceptional results.
+        </p>
+      </div>
+
+      <div class="features-grid">
+        <!-- six concise feature cards -->
+        <article class="feature-card">
+          <div class="feature-icon"><span class="material-icons">database</span></div>
+          <h3 class="feature-title">1,450+ Expert Prompts</h3>
+          <p class="feature-description">Professionally crafted across multiple industries and use cases.</p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon"><span class="material-icons">psychology</span></div>
+          <h3 class="feature-title">AI-Powered Analysis</h3>
+          <p class="feature-description">Instantly matches your idea to the most relevant templates.</p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon"><span class="material-icons">speed</span></div>
+          <h3 class="feature-title">Instant Results</h3>
+          <p class="feature-description">Ready-to-use prompts delivered in seconds.</p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon"><span class="material-icons">tune</span></div>
+          <h3 class="feature-title">Customizable Templates</h3>
+          <p class="feature-description">Easily adapt prompts to your exact needs.</p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon"><span class="material-icons">school</span></div>
+          <h3 class="feature-title">Expert Knowledge</h3>
+          <p class="feature-description">Content validated by industry professionals.</p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon"><span class="material-icons">integration_instructions</span></div>
+          <h3 class="feature-title">Easy Integration</h3>
+          <p class="feature-description">Drop prompts straight into your existing AI workflows.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HOW IT WORKS ===== -->
+  <section id="how-it-works" class="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-description">Three simple steps to generate world-class prompts.</p>
+      </div>
+
+      <div class="steps-container">
+        <div class="step">
+          <div class="step-number">01</div>
+          <h3 class="step-title">Describe Your Idea</h3>
+          <p class="step-description">Explain what you need the prompt to achieve—in plain English.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">02</div>
+          <h3 class="step-title">AI Finds Templates</h3>
+          <p class="step-description">Our engine scans 1,450+ examples to find the best match.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-number">03</div>
+          <h3 class="step-title">Receive Optimized Prompt</h3>
+          <p class="step-description">Get a tailor-made, ready-to-use prompt in seconds.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section class="cta">
+    <div class="container">
+      <h2 class="cta-title">Ready to Create Better AI Prompts?</h2>
+      <p  class="cta-description">Join thousands already transforming their AI interactions with AiWhisperer.</p>
+      <button class="btn btn-primary btn-large">
+        <span class="material-icons">rocket_launch</span>
+        Start Free Trial
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <!-- brand -->
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <span class="material-icons">psychology</span>
+            <span class="brand-text">AiWhisperer</span>
+          </div>
+          <p class="footer-description">
+            Transform ideas into powerful AI prompts with expert knowledge and cutting-edge tech.
+          </p>
+        </div>
+
+        <!-- columns -->
+        <div class="footer-links">
+          <div class="footer-column">
+            <h4 class="footer-title">Product</h4>
+            <a href="#" class="footer-link">Features</a>
+            <a href="#" class="footer-link">Pricing</a>
+            <a href="#" class="footer-link">API</a>
+          </div>
+          <div class="footer-column">
+            <h4 class="footer-title">Support</h4>
+            <a href="#" class="footer-link">Documentation</a>
+            <a href="#" class="footer-link">Help Center</a>
+            <a href="#" class="footer-link">Contact</a>
+          </div>
+          <div class="footer-column">
+            <h4 class="footer-title">Company</h4>
+            <a href="#" class="footer-link">About</a>
+            <a href="#" class="footer-link">Blog</a>
+            <a href="#" class="footer-link">Careers</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2025 AiWhisperer. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS -->
+  <script>
+    // Mobile Navigation Toggle
+document.addEventListener('DOMContentLoaded', function() {
+    const navToggle = document.querySelector('.nav-toggle');
+    const navMenu = document.querySelector('.nav-menu');
+    
+    if (navToggle) {
+        navToggle.addEventListener('click', function() {
+            navMenu.classList.toggle('active');
+        });
+    }
+    
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
                 });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Display enhanced results
-                    resultDiv.innerHTML = `
-                        <div class="result-header">
-                            <h3>✨ Your Enhanced Prompt Template</h3>
-                            <div class="enhancement-info">
-                                ${data.similar_prompts_used ? `
-                                    <span class="badge">📚 Enhanced with ${data.similar_prompts_used} expert examples</span>
-                                    <span class="badge">🎯 Context quality: ${data.context_quality}</span>
-                                    <span class="badge">🚀 AI Powered</span>
-                                ` : '<span class="badge">🎯 AI Generated</span>'}
-                            </div>
-                        </div>
-                        <div class="result-content">
-                            <pre id="generatedPrompt">${data.generated_template || (data.steps && data.steps[0] ? data.steps[0].output : 'No content generated')}</pre>
-                        </div>
-                        <div class="result-actions">
-                            <button class="copy-btn" onclick="copyToClipboard()">
-                                📋 Copy Template
-                            </button>
-                            <button class="regenerate-btn" onclick="regeneratePrompt()">
-                                🔄 Generate Another
-                            </button>
-                        </div>
-                    `;
-                    resultDiv.style.display = 'block';
-                    
-                } else {
-                    // Try fallback API
-                    await tryFallbackAPI(userInput);
-                }
-                
-            } catch (error) {
-                // Try fallback API on network error
-                await tryFallbackAPI(userInput);
-                
-            } finally {
-                loadingDiv.style.display = 'none';
-                generateBtn.disabled = false;
-                generateBtn.textContent = '🚀 Generate Enhanced Prompt';
             }
+        });
+    });
+    
+    // Navbar scroll effect
+    window.addEventListener('scroll', function() {
+        const navbar = document.querySelector('.navbar');
+        if (window.scrollY > 50) {
+            navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+            navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
+        } else {
+            navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+            navbar.style.boxShadow = 'none';
+        }
+    });
+});
+
+    async function generatePrompt() {
+        const userInput = document.getElementById('userInput').value.trim();
+        const loadingDiv = document.getElementById('loading');
+        const resultDiv = document.getElementById('result');
+        const generateBtn = document.getElementById('generateBtn');
+        
+        if (!userInput) {
+            alert('Please enter your request to get started!');
+            return;
         }
         
-        async function tryFallbackAPI(userInput) {
-            try {
-                const response = await fetch('/api/create_prompt_chain', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_input: userInput })
-                });
+        // Show loading state
+        loadingDiv.innerHTML = `
+            <div class="loading-steps">
+                <h4>🤖 AI Whisperer is analyzing your request...</h4>
+                <p>🔍 Searching through 1,450+ expert prompts...</p>
+                <p>🧠 Finding the most relevant examples...</p>
+                <p>✨ Generating your enhanced template...</p>
+            </div>
+        `;
+        loadingDiv.style.display = 'block';
+        resultDiv.style.display = 'none';
+        generateBtn.disabled = true;
+        generateBtn.textContent = '🔄 Processing...';
+        
+        try {
+            // Try enhanced API first
+            const response = await fetch('/api/enhanced_prompt_generation', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-Session-ID': generateSessionId()
+                },
+                body: JSON.stringify({ user_input: userInput })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Display enhanced results
+                resultDiv.innerHTML = `
+                    <div class="result-header">
+                        <h3>✨ Your Enhanced Prompt Template</h3>
+                        <div class="enhancement-info">
+                            ${data.similar_prompts_used ? `
+                                <span class="badge">📚 Enhanced with ${data.similar_prompts_used} expert examples</span>
+                                <span class="badge">🎯 Context quality: ${data.context_quality}</span>
+                                <span class="badge">🚀 AI Powered</span>
+                            ` : '<span class="badge">🎯 AI Generated</span>'}
+                        </div>
+                    </div>
+                    <div class="result-content">
+                        <pre id="generatedPrompt">${data.generated_template || (data.steps && data.steps[0] ? data.steps[0].output : 'No content generated')}</pre>
+                    </div>
+                    <div class="result-actions">
+                        <button class="copy-btn" onclick="copyToClipboard()">
+                            📋 Copy Template
+                        </button>
+                        <button class="regenerate-btn" onclick="regeneratePrompt()">
+                            🔄 Generate Another
+                        </button>
+                    </div>
+                `;
+                resultDiv.style.display = 'block';
                 
-                const data = await response.json();
-                
-                if (data.success && data.steps && data.steps[0]) {
-                    document.getElementById('result').innerHTML = `
-                        <div class="result-header">
-                            <h3>✨ Your Optimized Prompt Template</h3>
-                            <div class="enhancement-info">
-                                <span class="badge">🎯 AI Generated</span>
-                            </div>
-                        </div>
-                        <div class="result-content">
-                            <pre id="generatedPrompt">${data.steps[0].output}</pre>
-                        </div>
-                        <div class="result-actions">
-                            <button class="copy-btn" onclick="copyToClipboard()">
-                                📋 Copy Template
-                            </button>
-                            <button class="regenerate-btn" onclick="regeneratePrompt()">
-                                🔄 Generate Another
-                            </button>
-                        </div>
-                    `;
-                    document.getElementById('result').style.display = 'block';
-                } else {
-                    throw new Error(data.error || 'Failed to generate prompt');
-                }
-            } catch (error) {
+            } else {
+                // Try fallback API
+                await tryFallbackAPI(userInput);
+            }
+            
+        } catch (error) {
+            // Try fallback API on network error
+            await tryFallbackAPI(userInput);
+            
+        } finally {
+            loadingDiv.style.display = 'none';
+            generateBtn.disabled = false;
+            generateBtn.textContent = '🚀 Generate Enhanced Prompt';
+        }
+    }
+    
+    async function tryFallbackAPI(userInput) {
+        try {
+            const response = await fetch('/api/create_prompt_chain', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_input: userInput })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success && data.steps && data.steps[0]) {
                 document.getElementById('result').innerHTML = `
-                    <div class="error">
-                        ❌ <strong>Error generating prompt:</strong> ${error.message}
-                        <br><br>
-                        <em>Please try again or check if your Flask server is running properly.</em>
+                    <div class="result-header">
+                        <h3>✨ Your Optimized Prompt Template</h3>
+                        <div class="enhancement-info">
+                            <span class="badge">🎯 AI Generated</span>
+                        </div>
+                    </div>
+                    <div class="result-content">
+                        <pre id="generatedPrompt">${data.steps[0].output}</pre>
+                    </div>
+                    <div class="result-actions">
+                        <button class="copy-btn" onclick="copyToClipboard()">
+                            📋 Copy Template
+                        </button>
+                        <button class="regenerate-btn" onclick="regeneratePrompt()">
+                            🔄 Generate Another
+                        </button>
                     </div>
                 `;
                 document.getElementById('result').style.display = 'block';
-            }
-        }
-        
-        function generateSessionId() {
-            return 'session_' + Math.random().toString(36).substring(2, 15);
-        }
-        
-        function copyToClipboard() {
-            const promptText = document.getElementById('generatedPrompt').textContent;
-            
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(promptText).then(() => {
-                    showCopySuccess();
-                }).catch(() => {
-                    fallbackCopyToClipboard(promptText);
-                });
             } else {
-                fallbackCopyToClipboard(promptText);
+                throw new Error(data.error || 'Failed to generate prompt');
             }
+        } catch (error) {
+            document.getElementById('result').innerHTML = `
+                <div class="error">
+                    ❌ <strong>Error generating prompt:</strong> ${error.message}
+                    <br><br>
+                    <em>Please try again or check if your Flask server is running properly.</em>
+                </div>
+            `;
+            document.getElementById('result').style.display = 'block';
         }
+    }
+    
+    function generateSessionId() {
+        return 'session_' + Math.random().toString(36).substring(2, 15);
+    }
+    
+    function copyToClipboard() {
+        const promptText = document.getElementById('generatedPrompt').textContent;
         
-        function fallbackCopyToClipboard(text) {
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            textArea.style.position = 'fixed';
-            textArea.style.left = '-999999px';
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            
-            try {
-                document.execCommand('copy');
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(promptText).then(() => {
                 showCopySuccess();
-            } catch (err) {
-                alert('❌ Failed to copy. Please select and copy manually.');
-            } finally {
-                document.body.removeChild(textArea);
-            }
+            }).catch(() => {
+                fallbackCopyToClipboard(promptText);
+            });
+        } else {
+            fallbackCopyToClipboard(promptText);
         }
+    }
+    
+    function fallbackCopyToClipboard(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
         
-        function showCopySuccess() {
-            const copyBtn = document.querySelector('.copy-btn');
-            const originalText = copyBtn.textContent;
-            copyBtn.textContent = '✅ Copied!';
+        try {
+            document.execCommand('copy');
+            showCopySuccess();
+        } catch (err) {
+            alert('❌ Failed to copy. Please select and copy manually.');
+        } finally {
+            document.body.removeChild(textArea);
+        }
+    }
+    
+    function showCopySuccess() {
+        const copyBtn = document.querySelector('.copy-btn');
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = '✅ Copied!';
+        copyBtn.style.background = '#28a745';
+        
+        setTimeout(() => {
+            copyBtn.textContent = originalText;
             copyBtn.style.background = '#28a745';
-            
-            setTimeout(() => {
-                copyBtn.textContent = originalText;
-                copyBtn.style.background = '#28a745';
-            }, 2000);
-        }
-        
-        function regeneratePrompt() {
+        }, 2000);
+    }
+    
+    function regeneratePrompt() {
+        generatePrompt();
+    }
+    
+    // Add Enter key support (Ctrl+Enter to generate)
+    document.getElementById('userInput').addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key === 'Enter') {
+            e.preventDefault();
             generatePrompt();
         }
-        
-        // Add Enter key support (Ctrl+Enter to generate)
-        document.getElementById('userInput').addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.key === 'Enter') {
-                e.preventDefault();
-                generatePrompt();
-            }
-        });
-        
-        // Character counter
-        document.getElementById('userInput').addEventListener('input', function() {
-            const remaining = 500 - this.value.length;
-            // Could add character counter if needed
-        });
-    </script>
+    });
+    
+    // Character counter
+    document.getElementById('userInput').addEventListener('input', function() {
+        const remaining = 500 - this.value.length;
+        // Could add character counter if needed
+    });
+</script>
 </body>
 </html>
