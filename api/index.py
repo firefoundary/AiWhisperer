@@ -166,6 +166,7 @@ def log_prompt_generation(user_input, similar_prompts_count, context_quality, su
     except:
         pass  # Don't fail if logging fails
 
-# This is required for Vercel
+
 if __name__ == '__main__':
-    app.run()
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
