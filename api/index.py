@@ -136,19 +136,46 @@ def health_check():
     })
 
 def format_retrieved_context(similar_prompts):
-    """Format examples concisely"""
+    """Format examples with full context"""
     if not similar_prompts:
-        return "No examples available."
+        return "No similar examples found in database."
     
-    examples = []
+    context_parts = []
     for i, prompt in enumerate(similar_prompts, 1):
-        examples.append(f"Example {i}: {prompt['task_description']} - {prompt['good_prompt'][:150]}...")
+        context_parts.append(f"""
+Example {i}: {prompt['task_description']}
+Effective approach: {prompt['good_prompt'][:300]}...
+Category: {prompt.get('prompt_type', 'General')}
+        """)
     
-    return " ".join(examples)
+    return "\n".join(context_parts)
 
 def create_enhanced_system_prompt(user_input, context):
-    """Create concise, professional prompt without extra formatting"""
-    return f"""You are a professional prompt engineer. Based on the request "{user_input}" and these examples: {context}. Create a direct, professional prompt template using underscores for blanks. Keep it actionable."""
+    """Create detailed, structured prompt template"""
+    return f"""You are a skilled professional with over 10 years of experience in your field. Your expertise lies in understanding client needs and translating them into actionable project plans.
+
+Your task is to create a comprehensive, ready-to-use prompt template based on the user's request: "{user_input}"
+
+Consider these relevant examples from our knowledge base:
+{context}
+
+Generate a detailed prompt template that follows this structure:
+
+**Opening:** Start with "You are a skilled [profession] with extensive experience..."
+
+**Task Statement:** "Your task is to assist in creating [project type]..."
+
+**Fill-in Details:** Use underscores for blanks (e.g., "Project Details: __________")
+
+**Guidelines Section:** Include specific requirements and structure
+
+**Examples Section:** Provide concrete examples of what to include
+
+**Considerations Section:** List important factors and best practices
+
+**Implementation Notes:** End with practical implementation guidance
+
+Format the output as a complete, ready-to-use prompt template with clear sections separated by "---" dividers."""
 
 def calculate_context_quality(prompts):
     """Assess quality of retrieved context"""
