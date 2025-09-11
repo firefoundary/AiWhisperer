@@ -2,7 +2,7 @@
 const CONFIG = {
     SUPABASE_URL: 'YOUR_SUPABASE_URL', // Replace with your actual Supabase URL
     SUPABASE_ANON_KEY: 'YOUR_SUPABASE_ANON_KEY', // Replace with your actual anon key
-    API_BASE_URL: '/api', // Replace with your backend API URL
+    API_BASE_URL: '/api', // Your backend API URL
     GEMINI_API_KEY: 'YOUR_GEMINI_API_KEY' // Replace with your Gemini API key
 };
 
@@ -44,7 +44,7 @@ function setupEventListeners() {
             navMenu.classList.toggle('active');
         });
     }
-    
+
     // Smooth scrolling for navigation links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
@@ -58,7 +58,7 @@ function setupEventListeners() {
             }
         });
     });
-    
+
     // Navbar scroll effect
     window.addEventListener('scroll', function() {
         const navbar = document.querySelector('.navbar');
@@ -84,7 +84,6 @@ function setupEventListeners() {
 async function loadPromptCount() {
     try {
         let count;
-        
         if (supabase) {
             // Try Supabase first
             const { data, error } = await supabase
@@ -102,7 +101,6 @@ async function loadPromptCount() {
         
         // Update all count displays
         updatePromptCounts(count);
-        
     } catch (error) {
         console.error('Error loading prompt count:', error);
         updatePromptCounts(1450); // Fallback count
@@ -115,7 +113,7 @@ function updatePromptCounts(count) {
     
     const countElements = [
         'prompt-count',
-        'dynamic-prompt-count', 
+        'dynamic-prompt-count',
         'step-prompt-count'
     ];
     
@@ -154,124 +152,48 @@ async function loadPromptDatabase() {
     }
 }
 
-// Generate prompt function
+// Main generate prompt function - updated to match your backend
 async function generatePrompt() {
     const userIdea = document.getElementById('user-idea').value.trim();
-    const category = document.getElementById('category-filter').value;
+    const category = document.getElementById('category-filter') ? document.getElementById('category-filter').value : '';
     
     if (!userIdea) {
         alert('Please describe your idea first!');
         return;
     }
-    
+
     // Show loading state
     showLoadingState();
-    
+
     try {
-        // Generate prompt using AI
-        const generatedPrompt = await callGeminiAPI(userIdea, category);
-        
-        // Find similar prompts from database
-        const similarPrompts = await findSimilarPrompts(userIdea, category);
-        
-        // Display results
-        displayResults(generatedPrompt, similarPrompts);
-        
-    } catch (error) {
-        console.error('Error generating prompt:', error);
-        showErrorState();
-    }
-}
-
-// Call Gemini API for prompt generation
-async function callGeminiAPI(userIdea, category = '') {
-    try {
-        const systemPrompt = `You are an expert prompt engineer. Based on the user's idea and the database of expert prompts, create an optimized AI prompt that will help them achieve their goal.
-
-User's idea: "${userIdea}"
-Category: "${category || 'General'}"
-
-Create a well-structured, clear, and effective prompt that incorporates best practices for AI interaction. The prompt should be specific, actionable, and include relevant context.
-
-Return only the optimized prompt text, nothing else.`;
-
-        // Use your backend API to call Gemini
-        const response = await fetch(`${CONFIG.API_BASE_URL}/generate-prompt`, {
+        // Call your enhanced backend API
+        const response = await fetch(`${CONFIG.API_BASE_URL}/enhanced_prompt_generation`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                user_idea: userIdea,
-                category: category,
-                system_prompt: systemPrompt
+                user_input: userIdea
             })
         });
-        
+
         if (!response.ok) {
             throw new Error('Failed to generate prompt');
         }
-        
+
         const data = await response.json();
-        return data.generated_prompt || 'Error generating prompt';
         
-    } catch (error) {
-        console.error('Gemini API error:', error);
-        
-        // Fallback: create a basic prompt template
-        return createFallbackPrompt(userIdea, category);
-    }
-}
-
-// Create fallback prompt if API fails
-function createFallbackPrompt(userIdea, category) {
-    const templates = {
-        marketing: `Create compelling marketing content for: ${userIdea}. Focus on engaging your target audience, highlighting key benefits, and including a clear call-to-action.`,
-        content: `Generate high-quality content about: ${userIdea}. Ensure it's informative, well-structured, and engaging for your intended audience.`,
-        coding: `Help me with: ${userIdea}. Provide clean, well-documented code with explanations and best practices.`,
-        business: `Assist with business planning for: ${userIdea}. Include strategic considerations, potential challenges, and actionable recommendations.`,
-        creative: `Create creative content for: ${userIdea}. Be imaginative, original, and capture the essence of what I'm looking for.`,
-        analysis: `Analyze and provide insights on: ${userIdea}. Include data-driven observations, patterns, and actionable conclusions.`
-    };
-    
-    return templates[category] || `Help me with: ${userIdea}. Provide detailed, actionable guidance that addresses my specific needs and goals.`;
-}
-
-// Find similar prompts from database
-async function findSimilarPrompts(userIdea, category, limit = 3) {
-    try {
-        if (supabase && promptDatabase.length > 0) {
-            // Simple text matching - you can enhance this with proper NLP
-            let filteredPrompts = promptDatabase;
-            
-            // Filter by category if specified
-            if (category) {
-                filteredPrompts = promptDatabase.filter(prompt => 
-                    prompt.category && prompt.category.toLowerCase() === category.toLowerCase()
-                );
-            }
-            
-            // Simple keyword matching
-            const keywords = userIdea.toLowerCase().split(' ').filter(word => word.length > 3);
-            const scoredPrompts = filteredPrompts.map(prompt => {
-                const promptText = (prompt.prompt_text || prompt.content || '').toLowerCase();
-                const score = keywords.reduce((acc, keyword) => {
-                    return acc + (promptText.includes(keyword) ? 1 : 0);
-                }, 0);
-                return { ...prompt, similarity_score: score };
-            });
-            
-            // Sort by similarity and return top results
-            return scoredPrompts
-                .filter(p => p.similarity_score > 0)
-                .sort((a, b) => b.similarity_score - a.similarity_score)
-                .slice(0, limit);
+        if (data.success) {
+            // Display the enhanced results
+            displayResults(data.generated_template, data.similar_prompts_used, data.context_quality);
+            currentPromptData = data.generated_template;
+        } else {
+            throw new Error(data.error || 'Unknown error occurred');
         }
-        
-        return [];
+
     } catch (error) {
-        console.error('Error finding similar prompts:', error);
-        return [];
+        console.error('Error generating prompt:', error);
+        showErrorState(error.message);
     }
 }
 
@@ -281,81 +203,76 @@ function showLoadingState() {
     const loadingState = document.getElementById('loading-state');
     const resultsContent = document.getElementById('results-content');
     const errorState = document.getElementById('error-state');
-    
-    resultsSection.style.display = 'block';
-    loadingState.style.display = 'block';
-    resultsContent.style.display = 'none';
-    errorState.style.display = 'none';
-    
+
+    if (resultsSection) resultsSection.style.display = 'block';
+    if (loadingState) loadingState.style.display = 'block';
+    if (resultsContent) resultsContent.style.display = 'none';
+    if (errorState) errorState.style.display = 'none';
+
     // Scroll to results
-    resultsSection.scrollIntoView({ behavior: 'smooth' });
+    if (resultsSection) {
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+    }
 }
 
 // Display results
-function displayResults(generatedPrompt, similarPrompts) {
+function displayResults(generatedPrompt, similarPromptsUsed, contextQuality) {
     const loadingState = document.getElementById('loading-state');
     const resultsContent = document.getElementById('results-content');
     const generatedPromptElement = document.getElementById('generated-prompt');
-    const promptSuggestions = document.getElementById('prompt-suggestions');
-    
+
     // Hide loading, show results
-    loadingState.style.display = 'none';
-    resultsContent.style.display = 'block';
-    
+    if (loadingState) loadingState.style.display = 'none';
+    if (resultsContent) resultsContent.style.display = 'block';
+
     // Display generated prompt
-    generatedPromptElement.innerHTML = `
-        <div class="prompt-card">
-            <div class="prompt-header">
-                <span class="material-icons">auto_awesome</span>
-                <span>AI-Generated Prompt</span>
-            </div>
-            <div class="prompt-text">${generatedPrompt}</div>
-        </div>
-    `;
-    
-    // Store current prompt for copying
-    currentPromptData = generatedPrompt;
-    
-    // Display similar prompts
-    if (similarPrompts && similarPrompts.length > 0) {
-        promptSuggestions.innerHTML = similarPrompts.map(prompt => `
-            <div class="suggestion-card" onclick="usePromptTemplate('${prompt.id}')">
-                <div class="suggestion-header">
-                    <span class="suggestion-title">${prompt.title || 'Expert Template'}</span>
-                    <span class="suggestion-category">${prompt.category || 'General'}</span>
+    if (generatedPromptElement) {
+        generatedPromptElement.innerHTML = `
+            <div class="prompt-card">
+                <div class="prompt-header">
+                    <span class="material-icons">auto_awesome</span>
+                    Enhanced AI Prompt
+                    ${similarPromptsUsed ? `<small>(Using ${similarPromptsUsed} expert examples)</small>` : ''}
                 </div>
-                <div class="suggestion-preview">
-                    ${(prompt.prompt_text || prompt.content || '').substring(0, 100)}...
-                </div>
+                <div class="prompt-text">${generatedPrompt}</div>
+                ${contextQuality ? `<div class="context-quality">Context Quality: ${contextQuality}</div>` : ''}
             </div>
-        `).join('');
-    } else {
-        promptSuggestions.innerHTML = '<p class="no-suggestions">No similar templates found, but your generated prompt is ready to use!</p>';
+        `;
     }
 }
 
 // Show error state
-function showErrorState() {
+function showErrorState(errorMessage) {
     const loadingState = document.getElementById('loading-state');
     const resultsContent = document.getElementById('results-content');
     const errorState = document.getElementById('error-state');
-    
-    loadingState.style.display = 'none';
-    resultsContent.style.display = 'none';
-    errorState.style.display = 'block';
+
+    if (loadingState) loadingState.style.display = 'none';
+    if (resultsContent) resultsContent.style.display = 'none';
+    if (errorState) {
+        errorState.style.display = 'block';
+        errorState.innerHTML = `
+            <div class="error-message">
+                <span class="material-icons">error</span>
+                <h3>Error Generating Prompt</h3>
+                <p>${errorMessage}</p>
+                <button onclick="generatePrompt()" class="btn btn-primary">Try Again</button>
+            </div>
+        `;
+    }
 }
 
 // Copy prompt to clipboard
 async function copyPrompt() {
     if (!currentPromptData) return;
-    
+
     try {
         await navigator.clipboard.writeText(currentPromptData);
         
         // Visual feedback
         const copyBtn = event.target.closest('button');
         const originalText = copyBtn.innerHTML;
-        copyBtn.innerHTML = '<span class="material-icons">check</span>Copied!';
+        copyBtn.innerHTML = '<span class="material-icons">check</span> Copied!';
         copyBtn.classList.add('success');
         
         setTimeout(() => {
@@ -372,6 +289,8 @@ async function copyPrompt() {
         textArea.select();
         document.execCommand('copy');
         document.body.removeChild(textArea);
+        
+        alert('Prompt copied to clipboard!');
     }
 }
 
@@ -380,100 +299,23 @@ function regeneratePrompt() {
     generatePrompt();
 }
 
-// Use prompt template
-async function usePromptTemplate(promptId) {
-    try {
-        let promptData;
-        
-        if (supabase) {
-            const { data, error } = await supabase
-                .from('prompt_examples_dataset')
-                .select('*')
-                .eq('id', promptId)
-                .single();
-            
-            if (error) throw error;
-            promptData = data;
-        } else {
-            const response = await fetch(`${CONFIG.API_BASE_URL}/prompts/${promptId}`);
-            promptData = await response.json();
-        }
-        
-        if (promptData) {
-            currentPromptData = promptData.prompt_text || promptData.content;
-            
-            // Update the generated prompt display
-            const generatedPromptElement = document.getElementById('generated-prompt');
-            generatedPromptElement.innerHTML = `
-                <div class="prompt-card">
-                    <div class="prompt-header">
-                        <span class="material-icons">school</span>
-                        <span>Expert Template: ${promptData.title || 'Professional Prompt'}</span>
-                    </div>
-                    <div class="prompt-text">${currentPromptData}</div>
-                </div>
-            `;
-        }
-        
-    } catch (error) {
-        console.error('Error loading prompt template:', error);
-    }
-}
-
-// Validate input
+// Input validation
 function validateInput() {
-    const userIdea = document.getElementById('user-idea').value.trim();
+    const userIdea = document.getElementById('user-idea');
     const generateBtn = document.getElementById('generate-btn');
     
-    if (userIdea.length > 0) {
-        generateBtn.disabled = false;
-        generateBtn.classList.remove('disabled');
-    } else {
-        generateBtn.disabled = true;
-        generateBtn.classList.add('disabled');
+    if (userIdea && generateBtn) {
+        if (userIdea.value.trim().length > 0) {
+            generateBtn.disabled = false;
+            generateBtn.classList.remove('disabled');
+        } else {
+            generateBtn.disabled = true;
+            generateBtn.classList.add('disabled');
+        }
     }
 }
 
-// Utility functions
-function scrollToPromptGenerator() {
-    const section = document.getElementById('prompt-generator');
-    if (section) {
-        section.scrollIntoView({ behavior: 'smooth' });
-    }
-}
-
-function showDemo() {
-    const demoContent = document.getElementById('demo-content');
-    const processing = document.getElementById('processing-demo');
-    const output = document.getElementById('output-demo');
-    
-    // Reset demo
-    processing.style.display = 'none';
-    output.style.display = 'none';
-    
-    // Show processing
-    setTimeout(() => {
-        processing.style.display = 'flex';
-    }, 500);
-    
-    // Show output
-    setTimeout(() => {
-        processing.style.display = 'none';
-        output.style.display = 'flex';
-    }, 2500);
-    
-    // Reset after demo
-    setTimeout(() => {
-        output.style.display = 'none';
-    }, 5000);
-}
-
-// Error handling
-window.addEventListener('error', function(e) {
-    console.error('Application error:', e.error);
-});
-
-// Handle unhandled promise rejections
-window.addEventListener('unhandledrejection', function(e) {
-    console.error('Unhandled promise rejection:', e.reason);
-});
+// Expose functions globally for HTML onclick handlers
+window.generatePrompt = generatePrompt;
+window.copyPrompt = copyPrompt;
+window.regeneratePrompt = regeneratePrompt;
